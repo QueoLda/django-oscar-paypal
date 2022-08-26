@@ -125,8 +125,8 @@ class CancelResponseView(RedirectView):
         return super().get(request, *args, **kwargs)
 
     def get_redirect_url(self, **kwargs):
-        messages.error(self.request, _('PayPal transaction cancelled'))
-        return reverse('basket:summary')
+        messages.error(self.request, _("PayPal transaction cancelled"))
+        return reverse('checkout:payment-method')
 
 
 class SuccessResponseView(PaymentDetailsView):
