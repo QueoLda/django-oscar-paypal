@@ -243,7 +243,6 @@ class SuccessResponseView(PaymentDetailsView):
     def post(self, request, *args, **kwargs):
         """
         Place an order.
-
         We fetch the txn details again and then proceed with oscar's standard
         payment details view for placing the order.
         """
@@ -311,7 +310,7 @@ class SuccessResponseView(PaymentDetailsView):
         self.add_payment_event('Settled', confirm_txn.amount,
                                reference=confirm_txn.correlation_id)
 
-    def get_shipping_def get_shipping_address(self, basket):
+    def get_shipping_address(self, basket):
         """
         Return a created shipping address instance, created using
         the data returned by PayPal.
