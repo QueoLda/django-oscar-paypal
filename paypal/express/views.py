@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView, View
+
+from oscar.core import prices
 from oscar.apps.payment.exceptions import UnableToTakePayment
 from oscar.apps.shipping.methods import FixedPrice, NoShippingRequired
 from oscar.core.exceptions import ModuleNotFoundError
@@ -58,6 +60,8 @@ class RedirectView(CheckoutSessionMixin, RedirectView):
     # address.  This is False when redirecting to PayPal straight from the
     # basket page but True when redirecting from checkout.
     as_payment_method = False
+
+    skip_conditions = ["skip_unless_payment_is_required"]
 
     def get_redirect_url(self, **kwargs):
         try:
@@ -131,6 +135,11 @@ class RedirectView(CheckoutSessionMixin, RedirectView):
 
         params["paypal_params"] = self._get_paypal_params()
 
+        shipping_charge = prices.Price(currency=basket.currency, excl_tax=D("0.00"), tax=D("0.00"))
+        if params["shipping_method"]:
+            shipping_charge = params["shipping_method"].calculate(basket)
+        params["total"] = self.get_order_totals(basket, shipping_charge)
+
         return get_paypal_url(**params)
 
     def _get_paypal_params(self):
@@ -142,6 +151,7 @@ class RedirectView(CheckoutSessionMixin, RedirectView):
 
 class CancelResponseView(RedirectView):
     permanent = False
+    skip_conditions = []
 
     def get(self, request, *args, **kwargs):
         basket = get_object_or_404(Basket, id=kwargs["basket_id"], status=Basket.FROZEN)

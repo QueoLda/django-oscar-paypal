@@ -20,7 +20,7 @@ def _get_payment_action():
     return action
 
 
-def get_paypal_url(basket, shipping_methods, user=None, shipping_address=None,
+def get_paypal_url(basket, total, shipping_methods, user=None, shipping_address=None,
                    shipping_method=None, host=None, scheme=None,
                    paypal_params=None):
     """
@@ -65,6 +65,7 @@ def get_paypal_url(basket, shipping_methods, user=None, shipping_address=None,
             address = addresses[0]
 
     return set_txn(basket=basket,
+                   total=total,
                    shipping_methods=shipping_methods,
                    currency=currency,
                    return_url=return_url,
