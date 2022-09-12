@@ -214,6 +214,8 @@ def set_txn(basket, total, shipping_methods, currency, return_url, cancel_url, u
     # Checkout Flow"
     # https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_ECCustomizing
 
+    basket_total = basket.total_incl_tax_excl_discounts
+
     # Iterate over the 3 types of discount that can occur
     for discount in basket.offer_discounts:
         index += 1
@@ -224,6 +226,23 @@ def set_txn(basket, total, shipping_methods, currency, return_url, cancel_url, u
         params['L_PAYMENTREQUEST_0_AMT%d' % index] = _format_currency(
             -discount['discount'])
         params['L_PAYMENTREQUEST_0_QTY%d' % index] = 1
+
+        # This is necessary to ensure that you don't have a situation where you have a higher value of discounts in comparison to basket value.
+        # Example: Product1: 110€, Discount1: 50€, Discount2: 70€. Total discount: 120€
+        # This code ensures that the end result on the paypal bill is like this:
+        # Product1: 110€
+        # Discount1: 50€
+        # Discount2: 60€ (Even though it's actually 50€)
+        # Total: 0€
+        # The reason we need this is because paypal doesn't have a place for basket discounts (only shipping discount).
+        # So we need to put these discount values in lines that are intended for products.
+        # Meaning that in the end, paypal will sum all product and discount values and the result will have to be equal to the total of the order.
+        basket_total = basket_total - discount["discount"]
+        if basket_total < 0:
+            basket_total = basket_total + discount["discount"]
+            params['L_PAYMENTREQUEST_0_AMT%d' % index] = _format_currency(-basket_total)
+
+
     for discount in basket.voucher_discounts:
         index += 1
         name = "%s (%s)" % (discount['voucher'].name,
@@ -234,6 +253,21 @@ def set_txn(basket, total, shipping_methods, currency, return_url, cancel_url, u
         params['L_PAYMENTREQUEST_0_AMT%d' % index] = _format_currency(
             -discount['discount'])
         params['L_PAYMENTREQUEST_0_QTY%d' % index] = 1
+
+        # This is necessary to ensure that you don't have a situation where you have a higher value of discounts in comparison to basket value.
+        # Example: Product1: 110€, Discount1: 50€, Discount2: 70€. Total discount: 120€
+        # This code ensures that the end result on the paypal bill is like this:
+        # Product1: 110€
+        # Discount1: 50€
+        # Discount2: 60€ (Even though it's actually 50€)
+        # Total: 0€
+        # The reason we need this is because paypal doesn't have a place for basket discounts (only shipping discount).
+        # So we need to put these discount values in lines that are intended for products.
+        # Meaning that in the end, paypal will sum all product and discount values and the result will have to be equal to the total of the order.
+        basket_total = basket_total - discount["discount"]
+        if basket_total < 0:
+            basket_total = basket_total + discount["discount"]
+            params['L_PAYMENTREQUEST_0_AMT%d' % index] = _format_currency(-basket_total)
 
     # We include tax in the prices rather than separately as that's how it's
     # done on most British/Australian sites.  Will need to refactor in the
