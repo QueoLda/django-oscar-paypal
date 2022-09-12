@@ -232,7 +232,7 @@ def set_txn(basket, total, shipping_methods, currency, return_url, cancel_url, u
         # This code ensures that the end result on the paypal bill is like this:
         # Product1: 110€
         # Discount1: 50€
-        # Discount2: 60€ (Even though it's actually 50€)
+        # Discount2: 60€ (Even though it's actually 70€)
         # Total: 0€
         # The reason we need this is because paypal doesn't have a place for basket discounts (only shipping discount).
         # So we need to put these discount values in lines that are intended for products.
@@ -259,7 +259,7 @@ def set_txn(basket, total, shipping_methods, currency, return_url, cancel_url, u
         # This code ensures that the end result on the paypal bill is like this:
         # Product1: 110€
         # Discount1: 50€
-        # Discount2: 60€ (Even though it's actually 50€)
+        # Discount2: 60€ (Even though it's actually 70€)
         # Total: 0€
         # The reason we need this is because paypal doesn't have a place for basket discounts (only shipping discount).
         # So we need to put these discount values in lines that are intended for products.
