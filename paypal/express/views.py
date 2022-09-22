@@ -179,6 +179,19 @@ class SuccessResponseView(PaymentDetailsView):
     def pre_conditions(self):
         return []
 
+    def render_preview(self, request, **kwargs):
+        """
+        We no longer have a preview step. So we want render preview to go to the payment details.
+        Or rather, we never want to go to the preview step (preview=True), always preview=False.
+        """
+        self.preview = False
+        error_message = kwargs.get("error", None)
+        if error_message:
+            messages.error(self.request, error_message)
+        # ctx = self.get_context_data(**kwargs)
+        return redirect(reverse("checkout:payment-method"))
+        # return self.render_to_response(ctx)
+
     def get(self, request, *args, **kwargs):
         """
         Fetch details about the successful transaction from PayPal.
