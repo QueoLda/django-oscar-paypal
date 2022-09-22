@@ -363,9 +363,14 @@ def set_txn(
 
     for discount in basket.shipping_discounts:
         # If there is discount, we will go beyond this if continue.
-        apply = discount["offer"].apply_only_to_this_shipping_method.lower()
-        if apply and apply != shipping_method.get_verbose_class_name().lower():
-            continue
+        try:
+            apply = discount["offer"].apply_only_to_this_shipping_method.lower()
+            if apply and apply != shipping_method.get_verbose_class_name().lower():
+                continue
+        except Exception as ex:
+            # If for some reason this fails, let's just pretend it doesn't need to run.
+            # It's probably not set up at all.
+            pass
 
         # There is a discount! But let's not pass the discount as an item, we can SHIPDISCAMT.
 
