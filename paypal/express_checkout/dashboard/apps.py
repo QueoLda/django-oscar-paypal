@@ -17,7 +17,7 @@ class ExpressCheckoutDashboardApplication(OscarDashboardConfig):
         urlpatterns = [
             url('transactions/', views.TransactionListView.as_view(),
                  name='paypal-transaction-list'),
-            url('transactions/<int:pk>/', views.TransactionDetailView.as_view(),
+            url(r'^transactions/(?P<pk>\d+)/', views.TransactionDetailView.as_view(),
                  name='paypal-transaction-detail'),
         ]
         return self.post_process_urls(urlpatterns)

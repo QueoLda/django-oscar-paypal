@@ -7,7 +7,7 @@ from paypal.express.gateway import buyer_pays_on_paypal
 base_patterns = [
     # Views for normal flow that starts on the basket page
     url('redirect/', views.RedirectView.as_view(), name='paypal-redirect'),
-    url('cancel/<int:basket_id>/', views.CancelResponseView.as_view(),
+    url(r'^cancel/(?P<basket_id>\d+)/', views.CancelResponseView.as_view(),
          name='paypal-cancel-response'),
     # Callback for getting shipping options for a specific basket
     url(r'^shipping-options/(?P<basket_id>\d+)/(?P<country_code>\w+)?',
@@ -20,13 +20,13 @@ base_patterns = [
 
 
 buyer_pays_on_paypal_patterns = [
-    url('handle-order/<int:basket_id>/', views.SuccessResponseView.as_view(preview=True),
+    url(r'^handle-order/(?P<basket_id>\d+)/', views.SuccessResponseView.as_view(preview=True),
          name='paypal-handle-order'),
 ]
 
 buyer_pays_on_website_patterns = [
-    url('place-order/<int:basket_id>/', views.SuccessResponseView.as_view(), name='paypal-place-order'),
-    url('preview/<int:basket_id>/', views.SuccessResponseView.as_view(preview=True), name='paypal-success-response'),
+    url(r'place-order/(?P<basket_id>\d+)/', views.SuccessResponseView.as_view(), name='paypal-place-order'),
+    url(r'preview/(?P<basket_id>\d+)/', views.SuccessResponseView.as_view(preview=True), name='paypal-success-response'),
 ]
 
 

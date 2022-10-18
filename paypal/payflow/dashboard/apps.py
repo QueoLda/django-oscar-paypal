@@ -20,7 +20,7 @@ class PayFlowDashboardApplication(OscarDashboardConfig):
         urlpatterns = [
             url('transactions/', self.list_view.as_view(),
                  name='paypal-payflow-list'),
-            url('transactions/<int:pk>/', self.detail_view.as_view(),
+            url(r'^transactions/(?P<pk>\d+)/', self.detail_view.as_view(),
                  name='paypal-payflow-detail'),
         ]
         return self.post_process_urls(urlpatterns)
