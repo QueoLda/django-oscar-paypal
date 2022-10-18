@@ -1,4 +1,4 @@
-from django.urls import path
+from django.conf.urls import url
 from django.utils.translation import gettext_lazy as _
 from oscar.core.application import OscarDashboardConfig
 
@@ -15,9 +15,9 @@ class ExpressCheckoutDashboardApplication(OscarDashboardConfig):
         from . import views
 
         urlpatterns = [
-            path('transactions/', views.TransactionListView.as_view(),
+            url('transactions/', views.TransactionListView.as_view(),
                  name='paypal-transaction-list'),
-            path('transactions/<int:pk>/', views.TransactionDetailView.as_view(),
+            url('transactions/<int:pk>/', views.TransactionDetailView.as_view(),
                  name='paypal-transaction-detail'),
         ]
         return self.post_process_urls(urlpatterns)
