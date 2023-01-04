@@ -191,23 +191,36 @@ def set_txn(basket, shipping_methods, currency, return_url, cancel_url, update_u
     })
 
     # Add item details
-    index = 0
-    for index, line in enumerate(basket.all_lines()):
-        product = line.product
-        params['L_PAYMENTREQUEST_0_NAME%d' % index] = product.get_title()
-        params['L_PAYMENTREQUEST_0_NUMBER%d' % index] = (product.upc if
-                                                         product.upc else '')
-        desc = ''
-        if product.description:
-            desc = _format_description(product.description)
-        params['L_PAYMENTREQUEST_0_DESC%d' % index] = desc
-        # Note, we don't include discounts here - they are handled as separate
-        # lines - see below
-        params['L_PAYMENTREQUEST_0_AMT%d' % index] = _format_currency(
-            line.unit_price_incl_tax)
-        params['L_PAYMENTREQUEST_0_QTY%d' % index] = line.quantity
-        params['L_PAYMENTREQUEST_0_ITEMCATEGORY%d' % index] = (
-            'Physical' if product.is_shipping_required else 'Digital')
+    # index = 0
+    # for index, line in enumerate(basket.all_lines()):
+    #     product = line.product
+    #     params['L_PAYMENTREQUEST_0_NAME%d' % index] = product.get_title()
+    #     params['L_PAYMENTREQUEST_0_NUMBER%d' % index] = (product.upc if
+    #                                                      product.upc else '')
+    #     desc = ''
+    #     if product.description:
+    #         desc = _format_description(product.description)
+    #     params['L_PAYMENTREQUEST_0_DESC%d' % index] = desc
+    #     # Note, we don't include discounts here - they are handled as separate
+    #     # lines - see below
+    #     params['L_PAYMENTREQUEST_0_AMT%d' % index] = _format_currency(
+    #         line.unit_price_incl_tax)
+    #     params['L_PAYMENTREQUEST_0_QTY%d' % index] = line.quantity
+    #     params['L_PAYMENTREQUEST_0_ITEMCATEGORY%d' % index] = (
+    #         'Physical' if product.is_shipping_required else 'Digital')
+
+    # NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+    # For this project, we are not sending the order information line by line.
+    # The reason is because we have to make an integration with SAGE. SAGE uses 6 decimal fields, Paypal uses 2, rounded values were causing issues.
+    # To work around this, we simply send one line with the total of the order.
+
+    params['L_PAYMENTREQUEST_0_NAME0'] = _("Order gomesbooks.com")
+    params['L_PAYMENTREQUEST_0_NUMBER0'] = str(basket.id) if basket.id else ''
+    params['L_PAYMENTREQUEST_0_DESC0'] = ""
+    # Note, we don't include discounts here - they are handled as separate lines - see below
+    params['L_PAYMENTREQUEST_0_AMT0'] = _format_currency(basket.total_incl_tax)
+    params['L_PAYMENTREQUEST_0_QTY0'] = 1
+    params['L_PAYMENTREQUEST_0_ITEMCATEGORY0'] = _('Physical')
 
     # If the order has discounts associated with it, the way PayPal suggests
     # using the API is to add a separate item for the discount with the value
